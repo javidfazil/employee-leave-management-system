@@ -6,7 +6,6 @@ import useAuth from "./context/useAuth.js";
 import EmployeeDashboard from "./pages/EmployeeDashboard.jsx";
 import LeaveManagement from "./pages/LeaveManagement.jsx";
 import Login from "./pages/Login.jsx";
-import ManagerLogin from "./pages/ManagerLogin.jsx";
 import Notifications from "./pages/Notifications.jsx";
 import Profile from "./pages/Profile.jsx";
 import Register from "./pages/Register.jsx";
@@ -37,8 +36,7 @@ const App = () => (
   <Routes>
     <Route path="/" element={<HomeRedirect />} />
     <Route path="/login" element={<RoleSelection />} />
-    <Route path="/login/employee" element={<Login />} />
-    <Route path="/login/manager" element={<ManagerLogin />} />
+    <Route path="/login/:role" element={<Login />} />
     <Route path="/register" element={<Register />} />
     <Route path="/register/manager" element={<Register />} />
 

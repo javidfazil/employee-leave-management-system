@@ -53,10 +53,6 @@ server/         routes, controllers, services, models, middleware, validations
 server/seed/    repeatable local sample data
 ```
 
-## API documentation
-
-Import [the Postman collection](docs/Employee_Leave_Management.postman_collection.json) and set its `baseUrl` and `token` collection variables. The full endpoint reference is below.
-
 ## API endpoints
 
 | Method | Endpoint | Purpose |
@@ -66,14 +62,6 @@ Import [the Postman collection](docs/Employee_Leave_Management.postman_collectio
 | GET | `/api/auth/me` | Current user |
 | GET | `/api/dashboard/employee` | Employee dashboard |
 | GET | `/api/dashboard/manager` | Manager dashboard |
-| POST | `/api/leaves` | Employee creates a leave request |
-| GET | `/api/leaves/my` | Employee leave history (`page`, `limit`, `fromDate`, `toDate`) |
-| PATCH | `/api/leaves/:leaveId/cancel` | Employee cancels a pending request |
-| GET | `/api/manager/dashboard` | Manager totals, including employees on leave today |
-| GET | `/api/manager/requests?status=Pending` | Manager reviews requests by status |
-| PATCH | `/api/manager/requests/:leaveId/approve` | Manager approves a pending request (optional `managerRemark`) |
-| PATCH | `/api/manager/requests/:leaveId/reject` | Manager rejects a pending request (optional `managerRemark`) |
-| GET | `/api/notifications` | Current user's notifications and unread count |
-| PATCH | `/api/notifications/read-all` | Mark all current-user notifications as read |
-| PATCH | `/api/notifications/:notificationId/read` | Mark one notification as read |
-| DELETE | `/api/notifications/:notificationId` | Delete one current-user notification |
+| POST/GET | `/api/leaves`, `/api/leaves/my` | Create/list leave requests (`page`, `limit`, `fromDate`, `toDate`) |
+| PATCH | `/api/leaves/:leaveId/approve`, `/reject`, `/cancel` | Update a leave request |
+| GET/PATCH/DELETE | `/api/notifications` | Read and manage notifications |

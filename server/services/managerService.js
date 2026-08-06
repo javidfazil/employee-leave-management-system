@@ -1,18 +1,17 @@
 import Leave from "../models/Leave.js";
 import { LEAVE_STATUS } from "../utils/constants.js";
-import { decideLeave, getEmployeesOnLeaveToday } from "./leaveService.js";
+import { decideLeave } from "./leaveService.js";
 
 const requestStatuses = [LEAVE_STATUS.PENDING, LEAVE_STATUS.APPROVED, LEAVE_STATUS.REJECTED];
 
 const getManagerSummary = async () => {
-  const [pending, approved, rejected, employeesOnLeaveToday] = await Promise.all([
+  const [pending, approved, rejected] = await Promise.all([
     Leave.countDocuments({ status: LEAVE_STATUS.PENDING }),
     Leave.countDocuments({ status: LEAVE_STATUS.APPROVED }),
     Leave.countDocuments({ status: LEAVE_STATUS.REJECTED }),
-    getEmployeesOnLeaveToday(),
   ]);
 
-  return { pending, approved, rejected, onLeaveToday: employeesOnLeaveToday.length };
+  return { pending, approved, rejected };
 };
 
 const getManagerRequests = async (status) => {
