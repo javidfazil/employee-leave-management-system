@@ -24,7 +24,7 @@ const RoleSelection = () => {
             <span><small className="role-card__label">PERSONAL WORKSPACE</small><strong>Employee Workspace</strong><small>Manage your leave requests, balance, and workplace updates.</small></span>
             <b aria-hidden="true">→</b>
           </button>
-          <button className="role-card role-card--manager" type="button" onClick={() => navigate("/register/manager")}>
+          <button className="role-card role-card--manager" type="button" onClick={() => navigate("/login/manager")}>
             <span className="role-card__icon" aria-hidden="true">◇</span>
             <span><small className="role-card__label">TEAM WORKSPACE</small><strong>Manager Control Center</strong><small>Review employee requests and manage approvals efficiently.</small></span>
             <b aria-hidden="true">→</b>

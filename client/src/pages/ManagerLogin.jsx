@@ -4,7 +4,7 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../context/useAuth.js";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 
-const Login = () => {
+const ManagerLogin = () => {
   const { login, user } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -12,9 +12,7 @@ const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  if (user) {
-    return <Navigate to="/" replace />;
-  }
+  if (user) return <Navigate to="/" replace />;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -22,8 +20,8 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      await login({ ...form, selectedRole: "employee" });
-      navigate(location.state?.from?.pathname || "/employee/dashboard", { replace: true });
+      await login({ ...form, selectedRole: "manager" });
+      navigate(location.state?.from?.pathname || "/manager/dashboard", { replace: true });
     } catch (requestError) {
       setError(requestError.response?.data?.message || "Unable to sign in. Try again.");
     } finally {
@@ -49,20 +47,20 @@ const Login = () => {
         <form className="auth-form" onSubmit={handleSubmit}>
           <Link className="auth-form__back" to="/login">← Select your workspace</Link>
           <div className="auth-form__header">
-            <span className="auth-form__role-icon" aria-hidden="true">◷</span>
-            <div><span className="eyebrow">EMPLOYEE WORKSPACE</span><h2>Employee Workspace</h2></div>
+            <span className="auth-form__role-icon" aria-hidden="true">◇</span>
+            <div><span className="eyebrow">MANAGER CONTROL CENTER</span><h2>Manager Control Center</h2></div>
           </div>
           {location.state?.message && <p className="form-success" role="status">{location.state.message}</p>}
-          <p className="auth-form__intro">Manage your profile, submit leave requests, track approvals, and stay connected with workplace updates.</p>
+          <p className="auth-form__intro">Review employee requests, manage approvals, and support efficient workforce operations.</p>
           {error && <p className="form-error">{error}</p>}
           <label>Email address<input type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} required /></label>
           <label>Password<input type="password" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required /></label>
-          <button className="button button--primary" disabled={isSubmitting} type="submit">{isSubmitting ? "Signing in..." : "Login as Employee →"}</button>
-          <p className="auth-form__footer">New here? <Link to="/register">Create an employee account</Link></p>
+          <button className="button button--primary" disabled={isSubmitting} type="submit">{isSubmitting ? "Signing in..." : "Login as Manager →"}</button>
+          <p className="auth-form__footer">New manager? <Link to="/register/manager">Create a manager account</Link></p>
         </form>
       </section>
     </div>
   );
 };
 
-export default Login;
+export default ManagerLogin;

@@ -45,8 +45,10 @@ const authenticateUser = async ({ email, password, selectedRole }) => {
   }
 
   if (user.role !== selectedRole) {
-    const requiredRole = user.role === "manager" ? "Manager" : "Employee";
-    throw createServiceError(`Please login using ${requiredRole} option`, 403);
+    const message = selectedRole === "manager"
+      ? "You do not have manager access"
+      : "You do not have employee access";
+    throw createServiceError(message, 403);
   }
 
   return { token: generateToken(user._id.toString()), user: formatUser(user) };

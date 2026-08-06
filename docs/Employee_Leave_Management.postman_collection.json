@@ -1,0 +1,49 @@
+{
+  "info": {
+    "name": "Employee Leave Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "leaveId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        { "name": "Register", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Employee Name\",\n  \"email\": \"employee@example.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"employee\"\n}" }, "url": "{{baseUrl}}/auth/register" } },
+        { "name": "Login", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"employee@example.com\",\n  \"password\": \"Password123!\",\n  \"selectedRole\": \"employee\"\n}" }, "url": "{{baseUrl}}/auth/login" } },
+        { "name": "Current User", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/auth/me" } }
+      ]
+    },
+    {
+      "name": "Employee Leave Requests",
+      "item": [
+        { "name": "Apply for Leave", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"leaveType\": \"casual\",\n  \"startDate\": \"2027-01-15\",\n  \"endDate\": \"2027-01-16\",\n  \"reason\": \"Personal leave\"\n}" }, "url": "{{baseUrl}}/leaves" } },
+        { "name": "My Leave History", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/leaves/my?page=1&limit=10" } },
+        { "name": "Cancel Pending Leave", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/leaves/{{leaveId}}/cancel" } }
+      ]
+    },
+    {
+      "name": "Manager Review",
+      "item": [
+        { "name": "Manager Dashboard", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/manager/dashboard" } },
+        { "name": "Pending Requests", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/manager/requests?status=Pending" } },
+        { "name": "Approve Request", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"managerRemark\": \"Approved\" }" }, "url": "{{baseUrl}}/manager/requests/{{leaveId}}/approve" } },
+        { "name": "Reject Request", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"managerRemark\": \"Unable to approve for these dates\" }" }, "url": "{{baseUrl}}/manager/requests/{{leaveId}}/reject" } }
+      ]
+    },
+    {
+      "name": "Dashboards and Notifications",
+      "item": [
+        { "name": "Employee Dashboard", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/dashboard/employee" } },
+        { "name": "Manager Dashboard", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/dashboard/manager" } },
+        { "name": "Notifications", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/notifications" } },
+        { "name": "Mark All Notifications Read", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/notifications/read-all" } },
+        { "name": "Mark Notification Read", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/notifications/{{notificationId}}/read" } },
+        { "name": "Delete Notification", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/notifications/{{notificationId}}" } }
+      ]
+    }
+  ]
+}
