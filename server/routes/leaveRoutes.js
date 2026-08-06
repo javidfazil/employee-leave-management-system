@@ -7,9 +7,9 @@ import {
   getAllLeaves,
   getMyLeaves,
   rejectLeave,
-  requireManager,
 } from "../controllers/leaveController.js";
 import { protect } from "../middleware/authMiddleware.js";
+import { allowRoles } from "../middleware/roleMiddleware.js";
 import {
   validateApplyLeave,
   validateLeaveId,
@@ -22,17 +22,17 @@ router.use(protect);
 
 router.post("/", validateApplyLeave, applyLeave);
 router.get("/my", getMyLeaves);
-router.get("/", requireManager, getAllLeaves);
+router.get("/", allowRoles("manager"), getAllLeaves);
 router.patch(
   "/:leaveId/approve",
-  requireManager,
+  allowRoles("manager"),
   validateLeaveId,
   validateManagerRemark,
   approveLeave
 );
 router.patch(
   "/:leaveId/reject",
-  requireManager,
+  allowRoles("manager"),
   validateLeaveId,
   validateManagerRemark,
   rejectLeave

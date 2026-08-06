@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import DashboardLayout from "./components/layout/DashboardLayout.jsx";
 import ProtectedRoute from "./components/routing/ProtectedRoute.jsx";
-import { useAuth } from "./context/AuthContext.jsx";
+import useAuth from "./context/useAuth.js";
 import EmployeeDashboard from "./pages/EmployeeDashboard.jsx";
 import LeaveManagement from "./pages/LeaveManagement.jsx";
 import Login from "./pages/Login.jsx";

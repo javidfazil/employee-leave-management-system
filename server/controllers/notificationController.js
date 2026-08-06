@@ -1,14 +1,12 @@
 import mongoose from "mongoose";
 
 import Notification from "../models/Notification.js";
+import { getUserNotifications } from "../services/notificationService.js";
 
 const getMyNotifications = async (req, res, next) => {
   try {
-    const notifications = await Notification.find({ user: req.user._id }).sort({
-      createdAt: -1,
-    });
-
-    res.status(200).json({ notifications });
+    const notifications = await getUserNotifications(req.user._id);
+    res.status(200).json(notifications);
   } catch (error) {
     next(error);
   }

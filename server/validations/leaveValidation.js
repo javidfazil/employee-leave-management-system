@@ -25,6 +25,12 @@ const validateApplyLeave = (req, res, next) => {
     return sendValidationError(res, "End date cannot be before start date");
   }
 
+  const today = new Date().toISOString().slice(0, 10);
+
+  if (startDate < today) {
+    return sendValidationError(res, "Leave cannot start on a past date");
+  }
+
   if (typeof reason !== "string" || reason.trim().length === 0) {
     return sendValidationError(res, "Reason is required");
   }

@@ -1,5 +1,6 @@
 import Leave from "../models/Leave.js";
 import User from "../models/User.js";
+import { getEmployeesOnLeaveToday } from "../services/leaveService.js";
 
 const getEmployeeDashboard = async (req, res, next) => {
   try {
@@ -40,6 +41,7 @@ const getManagerDashboard = async (req, res, next) => {
       approvedRequests,
       rejectedRequests,
       recentLeaves,
+      employeesOnLeaveToday,
     ] = await Promise.all([
       User.countDocuments({ role: "employee" }),
       Leave.countDocuments({ status: "Pending" }),
@@ -49,6 +51,7 @@ const getManagerDashboard = async (req, res, next) => {
         .populate("employee", "name email")
         .sort({ createdAt: -1 })
         .limit(5),
+      getEmployeesOnLeaveToday(),
     ]);
 
     res.status(200).json({
@@ -59,6 +62,7 @@ const getManagerDashboard = async (req, res, next) => {
         rejectedRequests,
       },
       recentLeaves,
+      employeesOnLeaveToday,
     });
   } catch (error) {
     next(error);

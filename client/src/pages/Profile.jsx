@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import api from "../api/api.js";
 import Card from "../components/ui/Card.jsx";
 import LoadingSpinner from "../components/ui/LoadingSpinner.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import useAuth from "../context/useAuth.js";
 
 const Profile = () => {
   const { user } = useAuth();

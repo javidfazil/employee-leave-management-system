@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
-import { useAuth } from "../context/AuthContext.jsx";
+import useAuth from "../context/useAuth.js";
 
 const Register = () => {
   const { register, user } = useAuth();

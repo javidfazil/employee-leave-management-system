@@ -5,7 +5,12 @@ const notFound = (req, res) => {
 };
 
 const errorHandler = (error, req, res, next) => {
-  const statusCode = res.statusCode >= 400 ? res.statusCode : 500;
+  void next;
+  const statusCode = error.statusCode || (error.code === 11000
+    ? 409
+    : res.statusCode >= 400
+      ? res.statusCode
+      : 500);
 
   res.status(statusCode).json({
     message: error.message || "Internal server error",

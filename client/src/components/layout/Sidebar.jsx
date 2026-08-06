@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-import { useAuth } from "../../context/AuthContext.jsx";
+import useAuth from "../../context/useAuth.js";
 
 const Sidebar = ({ isCollapsed, isOpen, onClose }) => {
   const { user } = useAuth();

@@ -1,50 +1,20 @@
 import Leave from "../models/Leave.js";
-import Notification from "../models/Notification.js";
 import User from "../models/User.js";
+import {
+  createManagerNotifications,
+  createUserNotification,
+  notifySafely,
+} from "../services/notificationService.js";
+import { calculateLeaveDuration, toUtcDate } from "../services/leaveService.js";
 
 const pendingStatuses = ["Pending", "Approved"];
-
-const toUtcDate = (date) => new Date(`${date}T00:00:00.000Z`);
-
-const calculateTotalDays = (startDate, endDate) =>
-  Math.round((toUtcDate(endDate) - toUtcDate(startDate)) / 86_400_000) + 1;
-
-const createManagerNotifications = async (message) => {
-  const managers = await User.find({ role: "manager" }).select("_id").lean();
-
-  if (managers.length > 0) {
-    await Notification.insertMany(
-      managers.map(({ _id }) => ({ user: _id, message }))
-    );
-  }
-};
-
-const createUserNotification = async (user, message) => {
-  await Notification.create({ user, message });
-};
-
-const notifySafely = async (createNotification) => {
-  try {
-    await createNotification();
-  } catch (error) {
-    console.error("Failed to create notification:", error.message);
-  }
-};
-
-const requireManager = (req, res, next) => {
-  if (req.user.role !== "manager") {
-    return res.status(403).json({ message: "Manager access is required" });
-  }
-
-  next();
-};
 
 const applyLeave = async (req, res, next) => {
   try {
     const { leaveType, startDate, endDate, reason } = req.body;
     const normalizedStartDate = toUtcDate(startDate);
     const normalizedEndDate = toUtcDate(endDate);
-    const totalDays = calculateTotalDays(startDate, endDate);
+    const totalDays = calculateLeaveDuration(startDate, endDate);
 
     const overlappingLeave = await Leave.exists({
       employee: req.user._id,
@@ -271,5 +241,4 @@ export {
   getAllLeaves,
   getMyLeaves,
   rejectLeave,
-  requireManager,
 };

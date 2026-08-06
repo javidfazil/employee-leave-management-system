@@ -1,8 +1,7 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import api from "../api/api.js";
-
-const AuthContext = createContext(null);
+import AuthContext from "./authContext.js";
 
 const getStoredUser = () => {
   const storedUser = localStorage.getItem("user");
@@ -18,46 +17,36 @@ const getStoredUser = () => {
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getStoredUser);
 
-  const persistAuth = ({ token, user: authenticatedUser }) => {
+  const persistAuth = useCallback(({ token, user: authenticatedUser }) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(authenticatedUser));
     setUser(authenticatedUser);
-  };
+  }, []);
 
-  const login = async (credentials) => {
+  const login = useCallback(async (credentials) => {
     const { data } = await api.post("/auth/login", credentials);
     persistAuth(data);
     return data.user;
-  };
+  }, [persistAuth]);
 
-  const register = async (details) => {
+  const register = useCallback(async (details) => {
     const { data } = await api.post("/auth/register", details);
     persistAuth(data);
     return data.user;
-  };
+  }, [persistAuth]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
-  };
+  }, []);
 
   const value = useMemo(
     () => ({ user, login, logout, register }),
-    [user]
+    [user, login, logout, register]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-const useAuth = () => {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-
-  return context;
-};
-
-export { AuthProvider, useAuth };
+export { AuthProvider };
