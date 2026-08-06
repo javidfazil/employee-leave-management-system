@@ -3,10 +3,12 @@ import { useCallback, useEffect, useState } from "react";
 import api from "../api/api.js";
 import EmptyState from "../components/ui/EmptyState.jsx";
 import LoadingSpinner from "../components/ui/LoadingSpinner.jsx";
+import useNotifications from "../context/useNotifications.js";
 import useToast from "../context/useToast.js";
 
 const Notifications = () => {
   const { showToast } = useToast();
+  const { markAllNotificationsAsRead, markNotificationAsRead } = useNotifications();
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -24,7 +26,7 @@ const Notifications = () => {
 
   const markAllRead = async () => {
     try {
-      await api.patch("/notifications/read-all");
+      await markAllNotificationsAsRead();
       setNotifications((items) => items.map((item) => ({ ...item, isRead: true })));
       showToast("All notifications marked as read.");
     } catch {
@@ -34,7 +36,7 @@ const Notifications = () => {
 
   const markRead = async (id) => {
     try {
-      await api.patch(`/notifications/${id}/read`);
+      await markNotificationAsRead(id);
       setNotifications((items) => items.map((item) => item._id === id ? { ...item, isRead: true } : item));
     } catch {
       showToast("Unable to mark the notification as read.");

@@ -38,7 +38,7 @@ const ThemeToggle = ({ className = "" }) => {
         aria-haspopup="menu"
         onClick={() => setIsOpen((open) => !open)}
       >
-        <span aria-hidden="true">🌙</span><span>Theme</span><span className="theme-toggle__chevron" aria-hidden="true">⌄</span>
+        <span aria-hidden="true">🌙</span><span>Theme</span>
       </button>
       {isOpen && <div className="theme-toggle__menu" role="menu" aria-label="Color theme">
         {options.map((option) => <button

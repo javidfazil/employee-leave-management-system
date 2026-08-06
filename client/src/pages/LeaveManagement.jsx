@@ -9,7 +9,10 @@ import useAuth from "../context/useAuth.js";
 import useToast from "../context/useToast.js";
 
 const formatDate = (date) => new Intl.DateTimeFormat("en", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(date));
-const getToday = () => new Date().toISOString().slice(0, 10);
+const getToday = () => {
+  const now = new Date();
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+};
 
 const getDuration = (startDate, endDate) => {
   if (!startDate || !endDate || startDate > endDate) return null;
@@ -30,6 +33,7 @@ const LeaveManagement = () => {
   const [reviewLeave, setReviewLeave] = useState(null);
   const [reviewAction, setReviewAction] = useState("approve");
   const [form, setForm] = useState({ leaveType: "casual", startDate: "", endDate: "", reason: "" });
+  const [dateError, setDateError] = useState("");
   const [remark, setRemark] = useState("");
   const duration = getDuration(form.startDate, form.endDate);
   const today = getToday();
@@ -54,9 +58,18 @@ const LeaveManagement = () => {
 
   const applyLeave = async (event) => {
     event.preventDefault();
+    if (form.startDate < today) {
+      setDateError("Start date must be today or later.");
+      return;
+    }
+    if (form.endDate < form.startDate) {
+      setDateError("End date cannot be before the start date.");
+      return;
+    }
     try {
       await api.post("/leaves", form);
       setForm({ leaveType: "casual", startDate: "", endDate: "", reason: "" });
+      setDateError("");
       setIsApplyOpen(false);
       showToast("Leave request submitted.");
       setPage(1);
@@ -64,6 +77,21 @@ const LeaveManagement = () => {
     } catch (error) {
       showToast(error.response?.data?.message || "Unable to submit leave request.");
     }
+  };
+
+  const updateLeaveDate = (field, value) => {
+    const nextForm = { ...form, [field]: value };
+
+    if (field === "startDate" && value < today) {
+      setDateError("Start date must be today or later.");
+    } else if (field === "endDate" && value && value < form.startDate) {
+      setDateError("End date cannot be before the start date.");
+    } else {
+      setDateError("");
+    }
+
+    if (field === "startDate" && form.endDate && form.endDate < value) nextForm.endDate = "";
+    setForm(nextForm);
   };
 
   const cancelLeave = async () => {
@@ -98,7 +126,7 @@ const LeaveManagement = () => {
       </div>
       <div className="leave-toolbar card">
         <div className="leave-filters">
-          <label>From<input type="date" value={filters.fromDate} onChange={(event) => { setFilters({ ...filters, fromDate: event.target.value }); setPage(1); }} /></label>
+          <label>From<input type="date" value={filters.fromDate} onChange={(event) => { const fromDate = event.target.value; setFilters({ fromDate, toDate: filters.toDate < fromDate ? "" : filters.toDate }); setPage(1); }} /></label>
           <label>To<input type="date" min={filters.fromDate} value={filters.toDate} onChange={(event) => { setFilters({ ...filters, toDate: event.target.value }); setPage(1); }} /></label>
           {(filters.fromDate || filters.toDate) && <button className="text-button" type="button" onClick={() => { setFilters({ fromDate: "", toDate: "" }); setPage(1); }}>Clear filters</button>}
         </div>
@@ -112,7 +140,7 @@ const LeaveManagement = () => {
         <span>Page {pagination.page} of {pagination.totalPages}</span>
         <button className="button button--primary" type="button" disabled={page === pagination.totalPages} onClick={() => setPage((current) => current + 1)}>Next</button>
       </nav>}
-      {isApplyOpen && <Modal title="Submit Leave Request" onClose={() => setIsApplyOpen(false)}><form className="modal-form" onSubmit={applyLeave}><label>Leave type<select value={form.leaveType} onChange={(event) => setForm({ ...form, leaveType: event.target.value })}><option value="casual">Casual leave</option><option value="sick">Sick leave</option><option value="earned">Earned leave</option></select></label><div className="form-grid"><label>Start date<input type="date" min={today} value={form.startDate} onChange={(event) => setForm({ ...form, startDate: event.target.value })} required /></label><label>End date<input type="date" min={form.startDate || today} value={form.endDate} onChange={(event) => setForm({ ...form, endDate: event.target.value })} required /></label></div>{duration && <p className="form-hint">Duration: <strong>{duration} day{duration === 1 ? "" : "s"}</strong></p>}<label>Reason<textarea rows="4" value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} required /></label><div className="modal__actions"><button className="button button--secondary" type="button" onClick={() => setIsApplyOpen(false)}>Cancel</button><button className="button button--primary" type="submit">Submit Request</button></div></form></Modal>}
+      {isApplyOpen && <Modal title="Submit Leave Request" onClose={() => { setDateError(""); setIsApplyOpen(false); }}><form className="modal-form" onSubmit={applyLeave}><label>Leave type<select value={form.leaveType} onChange={(event) => setForm({ ...form, leaveType: event.target.value })}><option value="casual">Casual leave</option><option value="sick">Sick leave</option><option value="earned">Earned leave</option></select></label><div className="form-grid"><label>Start date<input type="date" min={today} value={form.startDate} onChange={(event) => updateLeaveDate("startDate", event.target.value)} required /></label><label>End date<input type="date" min={form.startDate || today} value={form.endDate} onChange={(event) => updateLeaveDate("endDate", event.target.value)} required /></label></div>{dateError && <p className="form-error" role="alert">{dateError}</p>}{duration && <p className="form-hint">Duration: <strong>{duration} day{duration === 1 ? "" : "s"}</strong></p>}<label>Reason<textarea rows="4" value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} required /></label><div className="modal__actions"><button className="button button--secondary" type="button" onClick={() => { setDateError(""); setIsApplyOpen(false); }}>Cancel</button><button className="button button--primary" type="submit">Submit Request</button></div></form></Modal>}
       {leaveToCancel && <ConfirmationDialog title="Withdraw leave request?" description="This will withdraw your pending leave request." onCancel={() => setLeaveToCancel(null)} onConfirm={cancelLeave} />}
       {reviewLeave && <Modal title={`${reviewAction === "approve" ? "Approve" : "Decline"} Request`} onClose={() => setReviewLeave(null)}><form className="modal-form" onSubmit={reviewRequest}><p className="modal-form__copy">{reviewLeave.employee?.name} requested {reviewLeave.totalDays} day(s) of {reviewLeave.leaveType} leave.</p><label>Manager remark <span>(optional)</span><textarea rows="4" value={remark} onChange={(event) => setRemark(event.target.value)} /></label><div className="modal__actions"><button className="button button--secondary" type="button" onClick={() => setReviewLeave(null)}>Cancel</button><button className="button button--primary" type="submit">{reviewAction === "approve" ? "Approve Request" : "Decline Request"}</button></div></form></Modal>}
     </section>

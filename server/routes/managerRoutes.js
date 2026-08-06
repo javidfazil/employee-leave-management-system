@@ -5,6 +5,7 @@ import {
   getDashboard,
   getEmployeeHistory,
   getEmployees,
+  getEmployeesOnLeaveToday,
   getRequestById,
   getRequests,
   rejectRequest,
@@ -25,6 +26,7 @@ router.put("/requests/:leaveId/approve", validateLeaveId, validateManagerRemark,
 router.put("/requests/:leaveId/reject", validateLeaveId, validateManagerRemark, rejectRequest);
 
 router.get("/employees", getEmployees);
+router.get("/on-leave-today", getEmployeesOnLeaveToday);
 router.get("/employees/:employeeId/leaves", getEmployeeHistory);
 
 export default router;

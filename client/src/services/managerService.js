@@ -11,6 +11,8 @@ const decideRequest = async (leaveId, decision, managerRemark) =>
 
 const getEmployees = async () => (await api.get("/manager/employees")).data.employees;
 
+const getEmployeesOnLeaveToday = async () => (await api.get("/manager/on-leave-today")).data.employees;
+
 const getEmployeeHistory = async (employeeId) => (await api.get(`/manager/employees/${employeeId}/leaves`)).data;
 
-export { decideRequest, getDashboard, getEmployeeHistory, getEmployees, getRequestById, getRequests };
+export { decideRequest, getDashboard, getEmployeeHistory, getEmployees, getEmployeesOnLeaveToday, getRequestById, getRequests };

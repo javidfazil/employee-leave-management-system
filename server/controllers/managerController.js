@@ -3,6 +3,7 @@ import {
   decideManagerRequest,
   getManagerEmployeeHistory,
   getManagerEmployees,
+  getManagerEmployeesOnLeaveToday,
   getManagerRequestById,
   getManagerRequests,
   getManagerSummary,
@@ -34,6 +35,10 @@ const getEmployees = asyncHandler(async (_req, res) => {
   res.status(200).json({ employees: await getManagerEmployees() });
 });
 
+const getEmployeesOnLeaveToday = asyncHandler(async (_req, res) => {
+  res.status(200).json({ employees: await getManagerEmployeesOnLeaveToday() });
+});
+
 const getEmployeeHistory = asyncHandler(async (req, res) => {
   res.status(200).json(await getManagerEmployeeHistory(req.params.employeeId));
 });
@@ -43,6 +48,7 @@ export {
   getDashboard,
   getEmployeeHistory,
   getEmployees,
+  getEmployeesOnLeaveToday,
   getRequestById,
   getRequests,
   rejectRequest,

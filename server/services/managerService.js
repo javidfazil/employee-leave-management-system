@@ -1,7 +1,7 @@
 import Leave from "../models/Leave.js";
 import User from "../models/User.js";
 import { LEAVE_STATUS, ROLES } from "../utils/constants.js";
-import { decideLeave, getEmployeesOnLeaveToday } from "./leaveService.js";
+import { decideLeave, getEmployeesOnLeaveToday as getTodayLeaves } from "./leaveService.js";
 
 const requestStatuses = [LEAVE_STATUS.PENDING, LEAVE_STATUS.APPROVED, LEAVE_STATUS.REJECTED];
 
@@ -16,7 +16,7 @@ const getManagerSummary = async () => {
     Leave.countDocuments({ status: LEAVE_STATUS.PENDING }),
     Leave.countDocuments({ status: LEAVE_STATUS.APPROVED }),
     Leave.countDocuments({ status: LEAVE_STATUS.REJECTED }),
-    getEmployeesOnLeaveToday(),
+    getTodayLeaves(),
   ]);
 
   return { pending, approved, rejected, onLeaveToday: onLeaveToday.length };
@@ -57,6 +57,8 @@ const decideManagerRequest = (leaveId, decision, managerRemark) =>
 const getManagerEmployees = () =>
   User.find({ role: ROLES.EMPLOYEE }).select("name email department leaveBalance createdAt").sort({ name: 1 });
 
+const getManagerEmployeesOnLeaveToday = () => getTodayLeaves();
+
 const getManagerEmployeeHistory = async (employeeId) => {
   const employee = await User.findOne({ _id: employeeId, role: ROLES.EMPLOYEE }).select(
     "name email department leaveBalance createdAt"
@@ -75,6 +77,7 @@ export {
   decideManagerRequest,
   getManagerEmployeeHistory,
   getManagerEmployees,
+  getManagerEmployeesOnLeaveToday,
   getManagerRequestById,
   getManagerRequests,
   getManagerSummary,

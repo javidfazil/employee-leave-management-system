@@ -1,34 +1,13 @@
-import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import api from "../../api/api.js";
 import useAuth from "../../context/useAuth.js";
+import useNotifications from "../../context/useNotifications.js";
 import ThemeToggle from "../ui/ThemeToggle.jsx";
 
 const TopNavbar = ({ onMenuClick, onSidebarToggle }) => {
   const { logout, user } = useAuth();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    let isActive = true;
-
-    const loadUnreadCount = async () => {
-      try {
-        const { data } = await api.get("/notifications");
-
-        if (isActive) setUnreadCount(data.unreadCount || 0);
-      } catch {
-        if (isActive) setUnreadCount(0);
-      }
-    };
-
-    void loadUnreadCount();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
   const handleLogout = () => {
     logout();
