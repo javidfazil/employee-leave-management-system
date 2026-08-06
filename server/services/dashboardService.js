@@ -1,7 +1,5 @@
 import Leave from "../models/Leave.js";
-import User from "../models/User.js";
-import { LEAVE_STATUS, ROLES } from "../utils/constants.js";
-import { getEmployeesOnLeaveToday } from "./leaveService.js";
+import { LEAVE_STATUS } from "../utils/constants.js";
 
 const getEmployeeDashboardData = async (user) => {
   const [pending, approved, rejected, recentLeaves] = await Promise.all([
@@ -22,31 +20,30 @@ const getEmployeeDashboardData = async (user) => {
 
 const getManagerDashboardData = async () => {
   const [
-    totalEmployees,
     pendingRequests,
     approvedRequests,
     rejectedRequests,
-    recentLeaves,
-    employeesOnLeaveToday,
+    pendingLeaves,
+    approvedLeaves,
+    rejectedLeaves,
   ] = await Promise.all([
-    User.countDocuments({ role: ROLES.EMPLOYEE }),
     Leave.countDocuments({ status: LEAVE_STATUS.PENDING }),
     Leave.countDocuments({ status: LEAVE_STATUS.APPROVED }),
     Leave.countDocuments({ status: LEAVE_STATUS.REJECTED }),
-    Leave.find().populate("employee", "name email").sort({ createdAt: -1 }).limit(5),
-    getEmployeesOnLeaveToday(),
+    Leave.find({ status: LEAVE_STATUS.PENDING }).populate("employee", "name email").sort({ createdAt: -1 }),
+    Leave.find({ status: LEAVE_STATUS.APPROVED }).populate("employee", "name email").sort({ decisionDate: -1, updatedAt: -1 }),
+    Leave.find({ status: LEAVE_STATUS.REJECTED }).populate("employee", "name email").sort({ decisionDate: -1, updatedAt: -1 }),
   ]);
 
   return {
     totals: {
-      employees: totalEmployees,
       pendingRequests,
       approvedRequests,
       rejectedRequests,
-      onLeaveToday: employeesOnLeaveToday.length,
     },
-    recentLeaves,
-    employeesOnLeaveToday,
+    pendingLeaves,
+    approvedLeaves,
+    rejectedLeaves,
   };
 };
 

@@ -29,9 +29,9 @@ const AuthProvider = ({ children }) => {
     return data.user;
   }, [persistAuth]);
 
-  const register = useCallback(async (details) => {
+  const register = useCallback(async (details, { persist = true } = {}) => {
     const { data } = await api.post("/auth/register", details);
-    persistAuth(data);
+    if (persist) persistAuth(data);
     return data.user;
   }, [persistAuth]);
 

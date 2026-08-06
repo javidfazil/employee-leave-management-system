@@ -14,10 +14,11 @@ const formatUser = (user) => ({
   name: user.name,
   email: user.email,
   role: user.role,
+  department: user.department,
   leaveBalance: user.leaveBalance,
 });
 
-const registerUser = async ({ name, email, password }) => {
+const registerUser = async ({ name, email, password, role = "employee", department = "" }) => {
   const normalizedEmail = email.trim().toLowerCase();
   const existingUser = await User.findOne({ email: normalizedEmail });
 
@@ -29,6 +30,8 @@ const registerUser = async ({ name, email, password }) => {
     name: name.trim(),
     email: normalizedEmail,
     password: await bcrypt.hash(password, 12),
+    role,
+    department: department.trim(),
   });
 
   return { token: generateToken(user._id.toString()), user: formatUser(user) };

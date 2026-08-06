@@ -53,9 +53,7 @@ const applyForLeave = async (employee, { leaveType, startDate, endDate, reason }
     reason: reason.trim(),
   });
 
-  await notifySafely(() =>
-    notifyManagers(`${employee.name} applied for ${totalDays} day(s) of ${leaveType} leave`)
-  );
+  await notifySafely(() => notifyManagers("New leave request submitted"));
 
   return leave;
 };
@@ -107,7 +105,7 @@ const decideLeave = async (leaveId, decision, managerRemark) => {
 
   const leave = await Leave.findOneAndUpdate(
     { _id: leaveId, status: LEAVE_STATUS.PENDING },
-    { $set: { status, ...(trimmedRemark && { managerRemark: trimmedRemark }) } },
+    { $set: { status, decisionDate: new Date(), ...(trimmedRemark && { managerRemark: trimmedRemark }) } },
     { new: true }
   );
 
@@ -127,7 +125,7 @@ const decideLeave = async (leaveId, decision, managerRemark) => {
       // Balance changed between the pending check and now — roll the approval back.
       await Leave.findOneAndUpdate(
         { _id: leave._id, status: LEAVE_STATUS.APPROVED },
-        { $set: { status: LEAVE_STATUS.PENDING }, $unset: { managerRemark: "" } }
+        { $set: { status: LEAVE_STATUS.PENDING }, $unset: { managerRemark: "", decisionDate: "" } }
       );
 
       throw badRequestError(`Insufficient ${leave.leaveType} leave balance`);
@@ -135,7 +133,7 @@ const decideLeave = async (leaveId, decision, managerRemark) => {
   }
 
   await notifySafely(() =>
-    notifyUser(leave.employee, `Your ${leave.leaveType} leave request has been ${status.toLowerCase()}`)
+    notifyUser(leave.employee, status === LEAVE_STATUS.APPROVED ? "Your leave request has been approved" : "Your leave request has been rejected")
   );
 
   return leave;

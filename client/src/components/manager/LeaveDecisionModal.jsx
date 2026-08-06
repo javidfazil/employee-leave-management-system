@@ -1,0 +1,5 @@
+import Modal from "../ui/Modal.jsx";
+
+const LeaveDecisionModal = ({ request, decision, remark, onRemarkChange, onClose, onSubmit }) => <Modal title={`${decision === "approve" ? "Permit" : "Reject"} leave request`} onClose={onClose}><form className="modal-form" onSubmit={onSubmit}><p className="modal-form__copy"><strong>{request.employee?.name || "Employee"}</strong> requested {request.totalDays} day{request.totalDays === 1 ? "" : "s"} of {request.leaveType} leave.</p><p className="modal-form__copy"><strong>Reason:</strong> {request.reason}</p><label>Manager remark <span>(optional)</span><textarea rows="4" value={remark} onChange={(event) => onRemarkChange(event.target.value)} /></label><div className="modal__actions"><button className="button button--secondary" type="button" onClick={onClose}>Cancel</button><button className="button button--primary" type="submit">{decision === "approve" ? "Permit Request" : "Reject Request"}</button></div></form></Modal>;
+
+export default LeaveDecisionModal;

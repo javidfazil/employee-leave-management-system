@@ -14,6 +14,17 @@ const Login = () => {
   const { role } = useParams();
   const selectedRole = role === "manager" ? "manager" : "employee";
   const isManager = selectedRole === "manager";
+  const roleContent = isManager
+    ? {
+        label: "MANAGER CONTROL CENTER",
+        title: "Manager Control Center",
+        description: "Review employee requests, manage approvals, and support efficient workforce operations.",
+      }
+    : {
+        label: "EMPLOYEE WORKSPACE",
+        title: "Employee Workspace",
+        description: "Manage your profile, submit leave requests, track approvals, and stay connected with workplace updates.",
+      };
 
   if (user) {
     return <Navigate to="/" replace />;
@@ -44,10 +55,11 @@ const Login = () => {
         <div className="auth-brand"><span className="brand-mark">P</span><span>Penataxial Technologies</span></div>
         <ThemeToggle className="theme-toggle--auth" />
         <div className="auth-copy">
-          <span className="eyebrow">WORKFORCE PORTAL</span>
-          <h1>Secure workforce management, built for your day.</h1>
-          <p>Manage leave, approvals, and workplace updates from one trusted workspace.</p>
+          <span className="eyebrow">INTERNAL WORKFORCE PLATFORM</span>
+          <h1>Empowering people through smarter workplace experiences.</h1>
+          <p>A secure digital workspace designed to simplify employee collaboration, leave management, and workforce operations.</p>
         </div>
+        <p className="auth-panel__footer">A workplace solution by Penataxial Technologies</p>
         <div className="auth-orb auth-orb--one" />
         <div className="auth-orb auth-orb--two" />
       </section>
@@ -56,14 +68,15 @@ const Login = () => {
           <Link className="auth-form__back" to="/login">← Select your workspace</Link>
           <div className="auth-form__header">
             <span className="auth-form__role-icon" aria-hidden="true">{isManager ? "◇" : "◷"}</span>
-            <div><span className="eyebrow">{isManager ? "MANAGER CONTROL CENTER" : "EMPLOYEE WORKSPACE"}</span><h2>Welcome Back</h2></div>
+            <div><span className="eyebrow">{roleContent.label}</span><h2>{roleContent.title}</h2></div>
           </div>
-          <p className="auth-form__intro">Access your workforce workspace securely.</p>
+          {location.state?.message && <p className="form-success" role="status">{location.state.message}</p>}
+          <p className="auth-form__intro">{roleContent.description}</p>
           {error && <p className="form-error">{error}</p>}
           <label>Email address<input type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} required /></label>
           <label>Password<input type="password" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required /></label>
-          <button className="button button--primary" disabled={isSubmitting} type="submit">{isSubmitting ? "Signing in..." : "Sign in"}</button>
-          {!isManager && <p className="auth-form__footer">New here? <Link to="/register">Create an employee account</Link></p>}
+          <button className="button button--primary" disabled={isSubmitting} type="submit">{isSubmitting ? "Signing in..." : "Sign In →"}</button>
+          <p className="auth-form__footer">{isManager ? <>New manager? <Link to="/register/manager">Create a manager account</Link></> : <>New here? <Link to="/register">Create an employee account</Link></>}</p>
         </form>
       </section>
     </div>

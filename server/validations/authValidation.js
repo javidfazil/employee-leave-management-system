@@ -4,7 +4,7 @@ const sendValidationError = (res, message) =>
   res.status(400).json({ message });
 
 const validateRegister = (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role = "employee", department } = req.body;
 
   if (typeof name !== "string" || name.trim().length < 2) {
     return sendValidationError(res, "Name must be at least 2 characters long");
@@ -16,6 +16,14 @@ const validateRegister = (req, res, next) => {
 
   if (typeof password !== "string" || password.length < 8) {
     return sendValidationError(res, "Password must be at least 8 characters long");
+  }
+
+  if (!["employee", "manager"].includes(role)) {
+    return sendValidationError(res, "Please select Employee or Manager registration");
+  }
+
+  if (role === "manager" && (typeof department !== "string" || department.trim().length < 2)) {
+    return sendValidationError(res, "Department must be at least 2 characters long");
   }
 
   next();

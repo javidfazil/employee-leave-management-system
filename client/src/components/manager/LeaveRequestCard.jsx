@@ -1,0 +1,3 @@
+const LeaveRequestCard = ({ request, onDecide }) => <article className="request-item manager-request-card"><div><strong>{request.employee?.name || "Former employee"}</strong><span>{request.leaveType} leave · {request.totalDays} day{request.totalDays === 1 ? "" : "s"}</span><span>{request.reason}</span></div>{onDecide && <div className="table-actions"><button className="text-button" type="button" onClick={() => onDecide(request, "approve")}>Permit</button><button className="text-button text-button--gold" type="button" onClick={() => onDecide(request, "reject")}>Reject</button></div>}</article>;
+
+export default LeaveRequestCard;

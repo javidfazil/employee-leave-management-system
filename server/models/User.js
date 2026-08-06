@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema(
       enum: ["employee", "manager"],
       default: "employee",
     },
+    department: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     leaveBalance: {
       type: leaveBalanceSchema,
       default: () => ({}),

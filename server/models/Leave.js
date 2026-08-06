@@ -39,6 +39,9 @@ const leaveSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    decisionDate: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );
