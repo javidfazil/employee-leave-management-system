@@ -54,6 +54,14 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Managers are approvers, not leave-takers — they never carry a leave balance.
+userSchema.pre("validate", function stripManagerLeaveBalance(next) {
+  if (this.role === "manager") {
+    this.leaveBalance = undefined;
+  }
+  next();
+});
+
 const User = mongoose.model("User", userSchema);
 
 export default User;

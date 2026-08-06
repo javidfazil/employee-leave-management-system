@@ -9,14 +9,18 @@ const createServiceError = (message, statusCode) => {
   return error;
 };
 
-const formatUser = (user) => ({
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  role: user.role,
-  department: user.department,
-  leaveBalance: user.leaveBalance,
-});
+const formatUser = (user) => {
+  const baseUser = {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    department: user.department,
+  };
+
+  // Managers do not own a leave balance — only include it for employees.
+  return user.role === "manager" ? baseUser : { ...baseUser, leaveBalance: user.leaveBalance };
+};
 
 const registerUser = async ({ name, email, password, role = "employee", department = "" }) => {
   const normalizedEmail = email.trim().toLowerCase();

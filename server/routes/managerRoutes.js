@@ -1,6 +1,14 @@
 import { Router } from "express";
 
-import { approveRequest, getDashboard, getRequests, rejectRequest } from "../controllers/managerController.js";
+import {
+  approveRequest,
+  getDashboard,
+  getEmployeeHistory,
+  getEmployees,
+  getRequestById,
+  getRequests,
+  rejectRequest,
+} from "../controllers/managerController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { allowRoles } from "../middleware/roleMiddleware.js";
 import { validateLeaveId, validateManagerRemark } from "../validations/leaveValidation.js";
@@ -8,9 +16,15 @@ import { validateLeaveId, validateManagerRemark } from "../validations/leaveVali
 const router = Router();
 
 router.use(protect, allowRoles("manager"));
+
 router.get("/dashboard", getDashboard);
+
 router.get("/requests", getRequests);
-router.patch("/requests/:leaveId/approve", validateLeaveId, validateManagerRemark, approveRequest);
-router.patch("/requests/:leaveId/reject", validateLeaveId, validateManagerRemark, rejectRequest);
+router.get("/requests/:leaveId", validateLeaveId, getRequestById);
+router.put("/requests/:leaveId/approve", validateLeaveId, validateManagerRemark, approveRequest);
+router.put("/requests/:leaveId/reject", validateLeaveId, validateManagerRemark, rejectRequest);
+
+router.get("/employees", getEmployees);
+router.get("/employees/:employeeId/leaves", getEmployeeHistory);
 
 export default router;

@@ -11,9 +11,10 @@ import Profile from "./pages/Profile.jsx";
 import Register from "./pages/Register.jsx";
 import RoleSelection from "./pages/RoleSelection.jsx";
 import ManagerDashboardPage, { ManagerPortalLayout } from "./pages/manager/ManagerDashboard.jsx";
-import PendingRequests from "./pages/manager/PendingRequests.jsx";
-import ApprovedRequests from "./pages/manager/ApprovedRequests.jsx";
-import RejectedRequests from "./pages/manager/RejectedRequests.jsx";
+import ManagerRequests from "./pages/manager/ManagerRequests.jsx";
+import RequestDetails from "./pages/manager/RequestDetails.jsx";
+import ManagerEmployees from "./pages/manager/ManagerEmployees.jsx";
+import EmployeeHistory from "./pages/manager/EmployeeHistory.jsx";
 import ManagerNotifications from "./pages/manager/ManagerNotifications.jsx";
 import ManagerProfile from "./pages/manager/ManagerProfile.jsx";
 
@@ -52,9 +53,10 @@ const App = () => (
     <Route element={<ProtectedRoute allowedRoles={["manager"]} />}>
       <Route element={<ManagerPortalLayout />}>
         <Route path="/manager/dashboard" element={<ManagerDashboardPage />} />
-        <Route path="/manager/pending-requests" element={<PendingRequests />} />
-        <Route path="/manager/approved-requests" element={<ApprovedRequests />} />
-        <Route path="/manager/rejected-requests" element={<RejectedRequests />} />
+        <Route path="/manager/requests" element={<ManagerRequests />} />
+        <Route path="/manager/requests/:id" element={<RequestDetails />} />
+        <Route path="/manager/employees" element={<ManagerEmployees />} />
+        <Route path="/manager/employees/:employeeId/history" element={<EmployeeHistory />} />
         <Route path="/manager/notifications" element={<ManagerNotifications />} />
         <Route path="/manager/profile" element={<ManagerProfile />} />
       </Route>

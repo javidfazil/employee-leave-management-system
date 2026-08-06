@@ -441,6 +441,11 @@ a:focus-visible {
 .panel,
 .stat-card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow-sm); }
 
+.tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.tab { padding: 10px 20px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text-muted); font-weight: 700; font-size: 14px; transition: all 150ms ease; }
+.tab:hover { border-color: var(--primary); color: var(--primary); }
+.tab--active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
 .stat-card { position: relative; min-height: 164px; padding: 24px; overflow: hidden; transition: box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease; animation: rise-in 420ms ease-out both; }
 .stat-card:nth-child(2) { animation-delay: 60ms; }
