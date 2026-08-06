@@ -1,80 +1,54 @@
-import mongoose from "mongoose";
+import asyncHandler from "../middleware/asyncHandler.js";
+import {
+  deleteUserNotification,
+  getUserNotifications,
+  markAllAsRead,
+  markAsRead,
+} from "../services/notificationService.js";
 
-import Notification from "../models/Notification.js";
-import { getUserNotifications } from "../services/notificationService.js";
+const objectIdPattern = /^[a-f\d]{24}$/i;
 
-const getMyNotifications = async (req, res, next) => {
-  try {
-    const notifications = await getUserNotifications(req.user._id);
-    res.status(200).json(notifications);
-  } catch (error) {
-    next(error);
+const validateNotificationId = (req, res, next) => {
+  if (!objectIdPattern.test(req.params.notificationId)) {
+    return res.status(400).json({ message: "Invalid notification ID" });
   }
+  next();
 };
 
-const markNotificationAsRead = async (req, res, next) => {
-  try {
-    const { notificationId } = req.params;
+const getMyNotifications = asyncHandler(async (req, res) => {
+  const result = await getUserNotifications(req.user._id);
+  res.status(200).json(result);
+});
 
-    if (!mongoose.isValidObjectId(notificationId)) {
-      return res.status(400).json({ message: "Invalid notification ID" });
-    }
+const markNotificationAsRead = asyncHandler(async (req, res) => {
+  const notification = await markAsRead(req.user._id, req.params.notificationId);
 
-    const notification = await Notification.findOneAndUpdate(
-      { _id: notificationId, user: req.user._id },
-      { $set: { isRead: true } },
-      { new: true }
-    );
-
-    if (!notification) {
-      return res.status(404).json({ message: "Notification not found" });
-    }
-
-    return res.status(200).json({ notification });
-  } catch (error) {
-    next(error);
+  if (!notification) {
+    return res.status(404).json({ message: "Notification not found" });
   }
-};
 
-const markAllNotificationsAsRead = async (req, res, next) => {
-  try {
-    const result = await Notification.updateMany(
-      { user: req.user._id, isRead: false },
-      { $set: { isRead: true } }
-    );
+  res.status(200).json({ notification });
+});
 
-    res.status(200).json({ modifiedCount: result.modifiedCount });
-  } catch (error) {
-    next(error);
+const markAllNotificationsAsRead = asyncHandler(async (req, res) => {
+  const result = await markAllAsRead(req.user._id);
+  res.status(200).json({ modifiedCount: result.modifiedCount });
+});
+
+const deleteNotification = asyncHandler(async (req, res) => {
+  const notification = await deleteUserNotification(req.user._id, req.params.notificationId);
+
+  if (!notification) {
+    return res.status(404).json({ message: "Notification not found" });
   }
-};
 
-const deleteNotification = async (req, res, next) => {
-  try {
-    const { notificationId } = req.params;
-
-    if (!mongoose.isValidObjectId(notificationId)) {
-      return res.status(400).json({ message: "Invalid notification ID" });
-    }
-
-    const notification = await Notification.findOneAndDelete({
-      _id: notificationId,
-      user: req.user._id,
-    });
-
-    if (!notification) {
-      return res.status(404).json({ message: "Notification not found" });
-    }
-
-    return res.status(204).send();
-  } catch (error) {
-    next(error);
-  }
-};
+  res.status(204).send();
+});
 
 export {
   deleteNotification,
   getMyNotifications,
   markAllNotificationsAsRead,
   markNotificationAsRead,
+  validateNotificationId,
 };

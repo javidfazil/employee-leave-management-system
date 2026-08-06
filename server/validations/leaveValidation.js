@@ -1,4 +1,7 @@
-const leaveTypes = ["casual", "sick", "earned"];
+import { LEAVE_TYPES } from "../utils/constants.js";
+import { isPastDate } from "../utils/calculateLeaveDays.js";
+
+const leaveTypes = LEAVE_TYPES;
 const objectIdPattern = /^[a-f\d]{24}$/i;
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -25,12 +28,9 @@ const validateApplyLeave = (req, res, next) => {
     return sendValidationError(res, "End date cannot be before start date");
   }
 
-  const today = new Date().toISOString().slice(0, 10);
-
-  if (startDate < today) {
+  if (isPastDate(startDate)) {
     return sendValidationError(res, "Leave cannot start on a past date");
   }
-
   if (typeof reason !== "string" || reason.trim().length === 0) {
     return sendValidationError(res, "Reason is required");
   }
