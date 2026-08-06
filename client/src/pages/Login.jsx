@@ -41,7 +41,16 @@ const Login = () => {
         authenticatedUser.role === "manager"
           ? "/manager/dashboard"
           : "/employee/dashboard";
-      navigate(location.state?.from?.pathname || fallbackPath, { replace: true });
+      const requestedPath = location.state?.from?.pathname;
+      // Only honor the "came from" redirect if it actually belongs to the role
+      // that just logged in — otherwise a manager who was previously bounced
+      // off /employee/... gets sent right back to the wrong dashboard.
+      const requestedPathMatchesRole =
+        requestedPath &&
+        (authenticatedUser.role === "manager"
+          ? requestedPath.startsWith("/manager")
+          : !requestedPath.startsWith("/manager"));
+      navigate(requestedPathMatchesRole ? requestedPath : fallbackPath, { replace: true });
     } catch (requestError) {
       setError(requestError.response?.data?.message || "Unable to sign in. Try again.");
     } finally {

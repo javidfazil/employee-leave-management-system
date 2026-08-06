@@ -39,7 +39,7 @@ const App = () => (
     <Route path="/login" element={<RoleSelection />} />
     <Route path="/login/:role" element={<Login />} />
     <Route path="/register" element={<Register />} />
-    <Route path="/register/manager" element={<Register />} />
+    <Route path="/register/:role" element={<Register />} />
 
     <Route element={<ProtectedRoute allowedRoles={["employee"]} />}>
       <Route element={<DashboardLayout />}>
