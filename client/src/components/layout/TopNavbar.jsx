@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import api from "../../api/api.js";
 import useAuth from "../../context/useAuth.js";
+import ThemeToggle from "../ui/ThemeToggle.jsx";
 
 const TopNavbar = ({ onMenuClick, onSidebarToggle }) => {
   const { logout, user } = useAuth();
@@ -41,6 +42,7 @@ const TopNavbar = ({ onMenuClick, onSidebarToggle }) => {
       </button>
       <button className="topbar__menu topbar__menu--desktop" type="button" onClick={onSidebarToggle}>☰</button>
       <div className="topbar__spacer" />
+      <ThemeToggle className="theme-toggle--navbar" />
       <Link className="topbar__bell" to="/notifications" aria-label={`Notifications${unreadCount ? ` (${unreadCount} unread)` : ""}`}>
         ♢
         {unreadCount > 0 && <span className="topbar__notification-count">{unreadCount > 99 ? "99+" : unreadCount}</span>}
@@ -53,7 +55,7 @@ const TopNavbar = ({ onMenuClick, onSidebarToggle }) => {
         </div>
       </div>
       <button className="topbar__logout" type="button" onClick={handleLogout}>
-        Sign out
+        Sign Out
       </button>
     </header>
   );

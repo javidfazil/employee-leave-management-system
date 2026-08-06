@@ -12,6 +12,7 @@ import { protect } from "../middleware/authMiddleware.js";
 import { allowRoles } from "../middleware/roleMiddleware.js";
 import {
   validateApplyLeave,
+  validateLeaveListQuery,
   validateLeaveId,
   validateManagerRemark,
 } from "../validations/leaveValidation.js";
@@ -21,8 +22,8 @@ const router = Router();
 router.use(protect);
 
 router.post("/", validateApplyLeave, applyLeave);
-router.get("/my", getMyLeaves);
-router.get("/", allowRoles("manager"), getAllLeaves);
+router.get("/my", validateLeaveListQuery, getMyLeaves);
+router.get("/", allowRoles("manager"), validateLeaveListQuery, getAllLeaves);
 router.patch(
   "/:leaveId/approve",
   allowRoles("manager"),

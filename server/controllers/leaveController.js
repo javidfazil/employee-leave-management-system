@@ -13,13 +13,13 @@ const applyLeave = asyncHandler(async (req, res) => {
 });
 
 const getMyLeaves = asyncHandler(async (req, res) => {
-  const leaves = await getLeavesForEmployee(req.user._id);
-  res.status(200).json({ leaves });
+  const result = await getLeavesForEmployee(req.user._id, req.query);
+  res.status(200).json(result);
 });
 
 const getAllLeaves = asyncHandler(async (req, res) => {
-  const leaves = await getAllLeaveRequests();
-  res.status(200).json({ leaves });
+  const result = await getAllLeaveRequests(req.query);
+  res.status(200).json(result);
 });
 
 const approveLeave = asyncHandler(async (req, res) => {

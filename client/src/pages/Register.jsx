@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import useAuth from "../context/useAuth.js";
+import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 
 const Register = () => {
   const { register, user } = useAuth();
@@ -30,11 +31,12 @@ const Register = () => {
   return (
     <div className="auth-page">
       <section className="auth-panel">
-        <div className="auth-brand"><span className="brand-mark">L</span> LeaveFlow</div>
+        <div className="auth-brand"><span className="brand-mark">P</span><span>Penataxial Technologies</span></div>
+        <ThemeToggle className="theme-toggle--auth" />
         <div className="auth-copy">
-          <span className="eyebrow">YOUR TIME, WELL MANAGED</span>
-          <h1>A clearer way to plan time away.</h1>
-          <p>Create your account and keep your leave requests organized.</p>
+          <span className="eyebrow">WORKFORCE PORTAL</span>
+          <h1>A secure workspace for your workforce journey.</h1>
+          <p>Create your employee account to manage leave, balances, and workplace updates.</p>
         </div>
         <div className="auth-orb auth-orb--one" />
         <div className="auth-orb auth-orb--two" />

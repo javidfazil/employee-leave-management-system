@@ -10,6 +10,7 @@ import ManagerDashboard from "./pages/ManagerDashboard.jsx";
 import Notifications from "./pages/Notifications.jsx";
 import Profile from "./pages/Profile.jsx";
 import Register from "./pages/Register.jsx";
+import RoleSelection from "./pages/RoleSelection.jsx";
 
 const HomeRedirect = () => {
   const { user } = useAuth();
@@ -29,7 +30,8 @@ const HomeRedirect = () => {
 const App = () => (
   <Routes>
     <Route path="/" element={<HomeRedirect />} />
-    <Route path="/login" element={<Login />} />
+    <Route path="/login" element={<RoleSelection />} />
+    <Route path="/login/:role" element={<Login />} />
     <Route path="/register" element={<Register />} />
 
     <Route element={<ProtectedRoute allowedRoles={["employee"]} />}>

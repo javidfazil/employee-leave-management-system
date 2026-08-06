@@ -38,17 +38,9 @@ const applyForLeave = async (employee, { leaveType, startDate, endDate, reason }
     throw conflictError("Leave dates overlap with an existing pending or approved leave");
   }
 
-  const [user, pendingLeaves] = await Promise.all([
-    User.findById(employee._id).select("leaveBalance"),
-    Leave.find({ employee: employee._id, leaveType, status: LEAVE_STATUS.PENDING })
-      .select("totalDays")
-      .lean(),
-  ]);
+  const user = await User.findById(employee._id).select("leaveBalance");
 
-  const reservedDays = pendingLeaves.reduce((sum, leave) => sum + leave.totalDays, 0);
-  const availableDays = user.leaveBalance[leaveType] - reservedDays;
-
-  if (totalDays > availableDays) {
+  if (totalDays > user.leaveBalance[leaveType]) {
     throw badRequestError(`Insufficient ${leaveType} leave balance`);
   }
 
@@ -68,11 +60,46 @@ const applyForLeave = async (employee, { leaveType, startDate, endDate, reason }
   return leave;
 };
 
-const getLeavesForEmployee = (employeeId) =>
-  Leave.find({ employee: employeeId }).sort({ createdAt: -1 });
+const buildLeaveQuery = ({ fromDate, toDate } = {}) => {
+  const query = {};
 
-const getAllLeaveRequests = () =>
-  Leave.find().populate("employee", "name email").sort({ createdAt: -1 });
+  if (fromDate || toDate) {
+    query.startDate = {};
+    if (fromDate) query.startDate.$gte = toUtcDate(fromDate);
+    if (toDate) {
+      const endOfDay = toUtcDate(toDate);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+      query.startDate.$lte = endOfDay;
+    }
+  }
+
+  return query;
+};
+
+const parsePagination = ({ page = 1, limit = 10 } = {}) => {
+  const parsedPage = Math.max(Number.parseInt(page, 10) || 1, 1);
+  const parsedLimit = Math.min(Math.max(Number.parseInt(limit, 10) || 10, 1), 100);
+  return { page: parsedPage, limit: parsedLimit };
+};
+
+const findLeaves = async (query, options, populateEmployee = false) => {
+  const { page, limit } = parsePagination(options);
+  const [leaves, total] = await Promise.all([
+    (populateEmployee ? Leave.find(query).populate("employee", "name email") : Leave.find(query))
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit),
+    Leave.countDocuments(query),
+  ]);
+
+  return { leaves, pagination: { page, limit, total, totalPages: Math.max(Math.ceil(total / limit), 1) } };
+};
+
+const getLeavesForEmployee = (employeeId, options) =>
+  findLeaves({ employee: employeeId, ...buildLeaveQuery(options) }, options);
+
+const getAllLeaveRequests = (options) =>
+  findLeaves(buildLeaveQuery(options), options, true);
 
 const decideLeave = async (leaveId, decision, managerRemark) => {
   const status = decision === "approve" ? LEAVE_STATUS.APPROVED : LEAVE_STATUS.REJECTED;
@@ -121,8 +148,8 @@ const cancelLeaveForEmployee = async (employeeId, employeeName, leaveId) => {
     throw notFoundError("Leave request not found");
   }
 
-  if (![LEAVE_STATUS.PENDING, LEAVE_STATUS.APPROVED].includes(leave.status)) {
-    throw conflictError("Only pending or approved leaves can be cancelled");
+  if (leave.status !== LEAVE_STATUS.PENDING) {
+    throw conflictError("Only pending leave requests can be cancelled");
   }
 
   const previousStatus = leave.status;
@@ -134,11 +161,6 @@ const cancelLeaveForEmployee = async (employeeId, employeeName, leaveId) => {
 
   if (!cancelledLeave) {
     throw conflictError("Leave status changed before it could be cancelled");
-  }
-
-  if (previousStatus === LEAVE_STATUS.APPROVED) {
-    const balancePath = `leaveBalance.${cancelledLeave.leaveType}`;
-    await User.findByIdAndUpdate(cancelledLeave.employee, { $inc: { [balancePath]: cancelledLeave.totalDays } });
   }
 
   await notifySafely(() =>

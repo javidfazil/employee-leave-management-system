@@ -6,12 +6,13 @@ const Sidebar = ({ isCollapsed, isOpen, onClose }) => {
   const { user } = useAuth();
   const dashboardPath =
     user.role === "manager" ? "/manager/dashboard" : "/employee/dashboard";
+  const isManager = user.role === "manager";
 
   return (
     <aside className={`sidebar ${isCollapsed ? "sidebar--collapsed" : ""} ${isOpen ? "sidebar--open" : ""}`}>
       <div className="sidebar__brand">
-        <span className="brand-mark">L</span>
-        <span className="sidebar__brand-name">LeaveFlow</span>
+        <span className="brand-mark">P</span>
+        <span className="sidebar__brand-name">Penataxial <small>Workforce Portal</small></span>
         <button className="sidebar__close" type="button" onClick={onClose}>
           ×
         </button>
@@ -19,18 +20,18 @@ const Sidebar = ({ isCollapsed, isOpen, onClose }) => {
 
       <nav className="sidebar__nav" aria-label="Primary navigation">
         <NavLink to={dashboardPath} className="sidebar__link" onClick={onClose}>
-          <span>▦</span><b>Dashboard</b>
+          <span>▦</span><b>{isManager ? "Operations Center" : "Employee Workspace"}</b>
         </NavLink>
         <span className="sidebar__section">WORKSPACE</span>
-        <NavLink to="/leaves" className="sidebar__link" onClick={onClose}><span>▤</span><b>Leave requests</b></NavLink>
-        <NavLink to="/notifications" className="sidebar__link" onClick={onClose}><span>♢</span><b>Notifications</b></NavLink>
+        <NavLink to="/leaves" className="sidebar__link" onClick={onClose}><span>▤</span><b>{isManager ? "Request Administration" : "My Leave History"}</b></NavLink>
+        <NavLink to="/notifications" className="sidebar__link" onClick={onClose}><span>♢</span><b>Updates & Alerts</b></NavLink>
         <span className="sidebar__section">ACCOUNT</span>
         <NavLink to="/profile" className="sidebar__link" onClick={onClose}><span>○</span><b>Profile</b></NavLink>
       </nav>
 
       <div className="sidebar__help">
-        <strong>Need help?</strong>
-        <span>Reach out to your HR team.</span>
+        <strong>HR support</strong>
+        <span>Contact the People Operations team.</span>
       </div>
     </aside>
   );

@@ -34,11 +34,16 @@ const registerUser = async ({ name, email, password }) => {
   return { token: generateToken(user._id.toString()), user: formatUser(user) };
 };
 
-const authenticateUser = async ({ email, password }) => {
+const authenticateUser = async ({ email, password, selectedRole }) => {
   const user = await User.findOne({ email: email.trim().toLowerCase() });
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
     throw createServiceError("Invalid email or password", 401);
+  }
+
+  if (user.role !== selectedRole) {
+    const requiredRole = user.role === "manager" ? "Manager" : "Employee";
+    throw createServiceError(`Please login using ${requiredRole} option`, 403);
   }
 
   return { token: generateToken(user._id.toString()), user: formatUser(user) };

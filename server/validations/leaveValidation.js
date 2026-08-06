@@ -50,6 +50,24 @@ const validateLeaveId = (req, res, next) => {
   next();
 };
 
+const validateLeaveListQuery = (req, res, next) => {
+  const { fromDate, toDate, page, limit } = req.query;
+
+  if ((fromDate && !isValidDate(fromDate)) || (toDate && !isValidDate(toDate))) {
+    return sendValidationError(res, "Date filters must use YYYY-MM-DD format");
+  }
+
+  if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
+    return sendValidationError(res, "To date cannot be before from date");
+  }
+
+  if ((page && (!/^\d+$/.test(page) || Number(page) < 1)) || (limit && (!/^\d+$/.test(limit) || Number(limit) < 1))) {
+    return sendValidationError(res, "Page and limit must be positive whole numbers");
+  }
+
+  next();
+};
+
 const validateManagerRemark = (req, res, next) => {
   const { managerRemark } = req.body;
 
@@ -66,6 +84,7 @@ const validateManagerRemark = (req, res, next) => {
 
 export {
   validateApplyLeave,
+  validateLeaveListQuery,
   validateLeaveId,
   validateManagerRemark,
 };

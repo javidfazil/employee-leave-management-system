@@ -22,7 +22,7 @@ const validateRegister = (req, res, next) => {
 };
 
 const validateLogin = (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, selectedRole } = req.body;
 
   if (typeof email !== "string" || !emailPattern.test(email.trim())) {
     return sendValidationError(res, "A valid email address is required");
@@ -30,6 +30,10 @@ const validateLogin = (req, res, next) => {
 
   if (typeof password !== "string" || password.length === 0) {
     return sendValidationError(res, "Password is required");
+  }
+
+  if (!["employee", "manager"].includes(selectedRole)) {
+    return sendValidationError(res, "Please select Employee or Manager login");
   }
 
   next();
